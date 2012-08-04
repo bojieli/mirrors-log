@@ -1,0 +1,25 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT ipv4_0, SUM(length) AS c FROM log WHERE ipv4_0 IS NOT NULL GROUP BY ipv4_0 ORDER BY c DESC LIMIT 30;
+EOF
+
+gnuplot -p << EOF
+set title 'Traffic among IPv4 first field'
+set xlabel 'IPv4 first field'
+set ylabel 'Traffic (bytes)'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data histogram
+set style fill solid 0.4 border
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Traffic'
+EOF

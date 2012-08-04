@@ -1,0 +1,37 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+TOTAL_TRAFFIC=`$MYSQL --column-names=0 -u root mirrors -e 'SELECT SUM(traffic) FROM filestat;'`
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME-1"
+SELECT SUM(filesize), SUM(traffic)*100000/$TOTAL_TRAFFIC FROM filestat GROUP BY traffic ORDER BY traffic DESC;
+EOF
+TOTAL_REQUEST=`$MYSQL --column-names=0 -u root mirrors -e 'SELECT SUM(requests) FROM filestat;'`
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME-2"
+SELECT SUM(filesize), SUM(requests)*100000/$TOTAL_REQUEST FROM filestat GROUP BY traffic ORDER BY traffic DESC;
+EOF
+TOTAL_FILENUM=`$MYSQL --column-names=0 -u root mirrors -e 'SELECT COUNT(*) FROM filestat;'`
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME-3"
+SELECT SUM(filesize), COUNT(*)*100000/$TOTAL_FILENUM FROM filestat GROUP BY traffic ORDER BY traffic DESC;
+EOF
+
+gnuplot -p << EOF
+set title 'Cumulative Ratio over Cumulative FileSize'
+set xlabel 'Cumulative FileSize (log-scale) (order by traffic of this file DESC)'
+set ylabel 'Cumulative Ratio'
+set autoscale
+set logscale x
+set yrange [0 to 1]
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+plot '$TMPDIR/$FILENAME-1' using 3:(\$4/100000) lw 5 title 'Cumulative Traffic (\%)', \
+'$TMPDIR/$FILENAME-2' using 3:(\$4/100000) lw 5 title 'Cumulative Requests (\%)', \
+'$TMPDIR/$FILENAME-3' using 3:(\$4/100000) lw 5 title 'Cumulative File Num (\%)'
+EOF

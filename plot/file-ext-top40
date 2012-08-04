@@ -1,0 +1,33 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM files"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(filesize) FROM files"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT extension, c/$COUNT, s/$LENGTH FROM (SELECT extension, COUNT(*) AS c, SUM(filesize) AS s FROM files GROUP BY extension ORDER BY s DESC LIMIT 41) AS t WHERE extension IS NOT NULL;
+EOF
+
+gnuplot -p << EOF
+set title 'FileNum and Filesize of popular file extensions'
+set xlabel ''
+set ylabel 'Percentage'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -90
+set bmargin 10
+set key top right
+set output "$PSDIR/$FILENAME.ps"
+#integer overflow. it is signed int!
+#ipstr(ip) = (sprintf("%d",floor(ip/(2**24))) .".". sprintf("%d",(ip & 255*(2**16))/(2**16)) .".". sprintf("%d",(ip & 255*(2**8))/(2**8)) .".". sprintf("%d",(ip & 255)))
+#intstr(ip) = ipstr(int(ip));
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Total Num', '$TMPDIR/$FILENAME' using 3:xticlabels(1) title 'Total Size'
+EOF

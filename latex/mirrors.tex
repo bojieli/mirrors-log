@@ -1,0 +1,900 @@
+\documentclass{beamer}
+\usetheme{Warsaw}
+\setbeamertemplate{headline}{}
+\usepackage{xltxtra}
+\usepackage{xcolor}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{array}
+
+\newcommand\graph[1]{{\includegraphics[width=4.5in]{../plot/ps/#1.ps}}}
+
+\begin{document}
+
+\title{Visualizing Mirrors}
+\subtitle{Access Log Analysis for mirrors.ustc.edu.cn}
+\author{bojieli@gmail.com}
+\institute{\copyright USTC LUG}
+\date{\today}
+\frame{\titlepage}
+
+\AtBeginSection[] {
+  \begin{frame}<beamer>{Outline}
+  \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\section{Requests \& Traffic}
+
+\begin{frame}{Notes}
+\begin{itemize}
+  \item The data is access log of mirrors.ustc.edu.cn in 51 days. See `Technical Details' section for more info about dataset.
+  \item Some graphs are in log-scale for clarity. Please note whether $x$ axis, $y$ axis or both are in log-scale. The graph title sometimes lies.
+  \item Because there may be many points in a graph, sampling is made to reduce file size (they are vector graphics), hence there may be some `straight lines'. I have checked the data to make sure the graphs illustrate real trends.
+  \item Title length is limited, so the title itself may not explain well, please keep an eye on the axis and keys of the graph.
+  \item Graphs are shown in the hope of conveying information without words. Any questions or suggestions, please email me.
+\end{itemize}
+\end{frame}
+
+\subsection{By Time}
+
+\begin{frame}{Requests \& Traffic in a day}
+\graph{req-daymin}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic in a week}
+\graph{req-weekday}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic across 50 days}
+\graph{req-days}
+\end{frame}
+
+\begin{frame}{Statistics}
+\begin{tabular}[t]{|l|r|r|}
+\hline
+ & Requests & Traffic \\
+\hline
+Total & 328976877 & 36892 GB \\
+Avg. per Day & 6450527 & 723.4 GB \\
+Max. per Day & 8632963 & 1049.5 GB \\
+Min. per Day & 4868022 & 421.5 GB \\
+Avg. per Hour & 268771 & 30.14 GB \\
+Max. per Hour & 561925 & 79.75 GB \\
+Min. per Hour & 99506 & 2.97 GB \\
+Avg. per Minute & 4480 & 514.4 MB \\
+Max. per Minute & 14714 & N/A \\
+Min. per Minute & 441 & N/A \\
+Avg. per Second & 74.66 & 8779 KB \\
+Max. per Second & 2117 & N/A \\
+Min. per Second & 1 & N/A \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item \tiny{Because the time recorded is only completion time of the request, and large requests can span hours, so Max./Min. per minute/second is not applicable.}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cumulative Requests per Hour}
+\graph{req-acc-hour}
+\end{frame}
+
+\begin{frame}{Cumulative Requests per Minute}
+\graph{req-acc-min}
+\end{frame}
+
+\begin{frame}{Cumulative Requests per Second}
+\graph{req-acc-sec}
+\end{frame}
+
+
+\subsection{By IP}
+
+\begin{frame}{Cumulative Traffic over IPs: 20\%-80\% law}
+\graph{traffic-acc-ip}
+\end{frame}
+
+\begin{frame}{Cumulative Requests over IPs: 20\%-80\% law}
+\graph{req-acc-ip}
+\end{frame}
+
+\begin{frame}{IPv4 vs. IPv6}
+\begin{tabular}[t]{|l|r|r|}
+\hline
+ & Requests & Traffic \\
+\hline
+IPv4 & 318575688 (96.84\%) & 34180 GB (92.65\%) \\
+IPv6 & 10401189 (3.15\%) & 2712 GB (7.35\%) \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item It can be seen that IPv6 still have a long way to go\ldots
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic TOP 40: xxx.0.0.0/24}
+\graph{req-ipv4-0}
+\end{frame}
+
+\begin{frame}{Traffic TOP 40: IPv4 addrs}
+\graph{req-ipv4-top40}
+\end{frame}
+
+\begin{frame}{Request count TOP 40: IPv4 addrs}
+\graph{req-ipv4-top40-req}
+\end{frame}
+
+\begin{frame}{USTC Mirrors Usage (IPv4 only)}
+\begin{tabular}[t]{|>{\tiny}l|>{\small}r|>{\small}r|>{\tiny}r|}
+\hline
+IP range & Requests & Traffic & Note \\
+\hline
+202.38.64.0-202.38.95.255 & 994661 (0.30\%) & 149.3 GB (0.40\%) & CERNET \\
+210.45.64.0-210.45.79.255 & 191141 (0.06\%) & 68.31 GB (0.19\%) & CERNET \\
+210.45.112.0-210.45.127.255 & 243976 (0.07\%) & 37.59 GB (0.10\%) & CERNET \\
+211.86.144.0-211.86.159.255 & 81035 (0.02\%) & 24.96 GB (0.07\%) & CERNET \\
+222.195.64.0-222.195.95.255 & 319435 (0.10\%) & 86.88 GB (0.24\%) & CERNET \\
+114.214.160.0-114.214.255.255 & 0 & 0 & CERNET \\
+210.72.22.0-210.72.22.255 & 3622 (0.00\%) & 11.86 MB (0.00\%) & TechNet (?) \\
+218.22.21.0-218.22.21.31 & 1 (0.00\%) & 0.01 MB (0.00\%) & China Telecom \\
+218.104.71.160-218.104.71.175 & 0 & 0 & China Unicom \\
+202.141.160.0-202.141.175.255 & 123455 (0.04\%) & 12.60 GB (0.03\%) & China Telecom \\
+202.141.176.0-202.141.191.255 & 187 (0.00\%) & 120.4 MB (0.00\%) & China Mobile \\
+Total & 1957513 (0.60\%) & 379.77 GB (1.03\%) & USTC IPv4 \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item \tiny{Data source of USTC IP range: http://lib.ustc.edu.cn/ustcip.html}
+\end{itemize}
+\end{frame}
+
+\subsection{By Other Measures}
+
+\begin{frame}{Requests \& Traffic of distributions}
+\graph{req-dist}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic of distributions}
+\graph{req-dist-req}
+\end{frame}
+
+
+\begin{frame}{Requests \& Traffic among HTTP Status Codes}
+\graph{req-status-code}
+\end{frame}
+
+
+\begin{frame}{Requests \& Traffic among User Agents}
+\graph{req-user-agent}
+\end{frame}
+
+
+\begin{frame}{Traffic per Request order by Length}
+\graph{req-traffic}
+\end{frame}
+
+\begin{frame}{Cumulative Traffic sorted by Request Length}
+\graph{req-traffic-acc}
+\end{frame}
+
+\begin{frame}{Request Num sorted by Request Length}
+\graph{req-traffic-all}
+\end{frame}
+
+
+\section{Files}
+
+\subsection{Files Characteristics}
+
+\begin{frame}{File Number at different FileSizes (log scale)}
+\graph{file-size-all}
+\end{frame}
+
+\begin{frame}{Total Size at different Filesizes (log scale)}
+\graph{file-size-total}
+\end{frame}
+
+\begin{frame}{Cumulative Filesize per File Num (normal scale)}
+\graph{file-num-size}
+\end{frame}
+
+\begin{frame}{Cumulative Filesize per File Num (log scale)}
+\graph{file-num-size-log}
+\end{frame}
+
+\begin{frame}{Cumulative Filesize per FileSize (normal scale)}
+\graph{file-size-acc-nologscale}
+\end{frame}
+
+\begin{frame}{Cumulative Filesize per FileSize (log scale)}
+\graph{file-size-acc}
+\end{frame}
+
+\begin{frame}{File Extensions TOP 40 (order by Total Size)}
+\graph{file-ext-top40}
+\end{frame}
+
+\begin{frame}{File Extensions TOP 40 (order by File Num)}
+\graph{file-ext-top40-count}
+\end{frame}
+
+\begin{frame}{How many files share a same filename (extension excluded)}
+\graph{file-same-filename}
+\end{frame}
+
+\begin{frame}{How many files share a same filename and extension}
+\graph{file-same-filename-ext}
+\end{frame}
+
+\begin{frame}{Num \& Size of Files in each Distribution (sorted by Size)}
+\graph{file-dist}
+\end{frame}
+
+\begin{frame}{Num \& Size of Files in each Distribution (sorted by Num)}
+\graph{file-dist-num}
+\end{frame}
+
+\subsection{How Files Are Requested}
+
+\begin{frame}{Cumulative Requests over FileSize order by Size}
+\graph{file-req-all}
+\end{frame}
+
+\begin{frame}{Cumulative Traffic over non-cumu. FileSize}
+\graph{file-traffic-all}
+\end{frame}
+
+\begin{frame}{Cumulative Traffic over non-cumu. Filesize (log-scale)}
+\graph{file-traffic-all-log}
+\end{frame}
+
+\begin{frame}{Cache 1: Cumu. Traffic over FileSize order by Size}
+\graph{file-traffic-size-acc}
+\end{frame}
+
+\begin{frame}{Cache 2: Cumu. Traffic over FileSize order by Size DESC}
+\graph{file-traffic-size-desc-acc}
+\end{frame}
+
+\begin{frame}{Cache 3: Cumu. Traffic over FileSize order by Req Num}
+\graph{file-traffic-req-acc}
+\end{frame}
+
+\begin{frame}{Cache 4: Cumu. Traffic over FileSize order by Traffic}
+\graph{file-traffic-traffic-acc}
+\end{frame}
+
+\begin{frame}{Comparison of the Previous four `Caching Policies'}
+\graph{file-traffic-four-acc}
+\end{frame}
+
+\begin{frame}{Comparison of `Caching Policies' (log-scale)}
+\graph{file-traffic-four-acc-log}
+\end{frame}
+
+\begin{frame}{Comparison of `Caching Policies'}
+\begin{itemize}
+  \item Among these static caching policies, caching files with most traffic or requests is acceptable.
+  \item Caching files that carried most traffic in history has a good performance. A 10GB cache can cover 40\% of the total traffic. If cache size continue to increase, the cache efficiency will deteriorate, since x axis of the graph is in log-scale.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Details of Most Traffic Caching (log-scale)}
+\graph{file-traffic-traffic-filenum}
+\end{frame}
+
+\begin{frame}{An Alternate Metric: Request Hits}
+\graph{file-req-four-acc}
+\end{frame}
+
+\begin{frame}{An Alternate Metric: Request Hits}
+\graph{file-req-four-acc-log}
+\end{frame}
+
+\begin{frame}{Num \& Size of Never-accessed Files (\% of total)}
+\graph{file-dist-never-req}
+\end{frame}
+
+\begin{frame}{Num \& Size of Never-accessed Files (\% of total)}
+\graph{file-dist-never-req-traffic}
+\end{frame}
+
+\begin{frame}{Num \& Size of Never-accessed Files (\% of distribution)}
+\graph{file-dist-never-req-percent}
+\end{frame}
+
+\begin{frame}{Num \& Size of Never-accessed Files (\% of distribution)}
+\graph{file-dist-never-req-percent-traffic}
+\end{frame}
+
+\begin{frame}{Num \& Size of Ever-accessed Files (\% of distribution)}
+\graph{file-dist-ever-req-percent}
+\end{frame}
+
+\begin{frame}{Num \& Size of Ever-accessed Files (\% of distribution)}
+\graph{file-dist-ever-req-percent-traffic}
+\end{frame}
+
+\section{Sessions}
+
+\begin{frame}{Discovering Sessions}
+\begin{definition}
+Two requests are within a same \emph{Interval Session} iff:
+\begin{itemize}
+  \item Have same IP address
+  \item The time difference does not exceed some limit
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+A \emph{Gap Session} is a longest sequence of requests where:
+\begin{itemize}
+  \item All requests are from the same IP address
+  \item Time difference of every two adjacent requests do not exceed some limit
+\end{itemize}
+\end{definition}
+\end{frame}
+
+\begin{frame}{Discovering Sessions (continued)}
+\begin{itemize}
+  \item Since Mirrors is a resource-downloading site, many sessions download many files for hours. The time limit of Interval Session is 60 minutes.
+  \item The time limit of Gap Session is 30 minutes. For long downloads that extend over 30 minutes, the session will be broken into two.
+  \item Both algorithms suffer from false positives and true negatives.
+  \item Some IPs access so frequently that the gap session never ends (see the next slide), making the Gap Session data highly biased.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Average Session Duration over IP (log-scale)}
+\graph{session-avg-duration-ip}
+\end{frame}
+
+\begin{frame}{Average Session Duration over IP (normal-scale)}
+\graph{session-avg-duration-ip-nolog}
+\end{frame}
+
+\begin{frame}{Gap Session Statistics in a day}
+\graph{session-daymin-gap}
+\end{frame}
+
+\begin{frame}{Explanation}
+\begin{itemize}
+  \item How strange the three graphs look! Durations are always integers (seconds), so there are straight lines in duration graphs.
+  \item Many sessions are actually `single' requests, so their duration is zero, and the amount of them can be seen in normal-scale graph.
+  \item About 40 sessions extend throughout the whole 51 days, and more sessions extend less days. The amount of them is the length of red horizontal line in log-scale graph.
+  \item Because the log starts at May 22 06:25:37, requests in these long-live Gap Sessions accumulate to a horrible peak at 06:27 in Gap Session statistics (much higher than shown, since the original data is noizy, and the graph is Bezier-smoothed).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cumulative Over Long-live Gap Sessions}
+\graph{session-longlive}
+\end{frame}
+
+\begin{frame}{Ratio to Average for Long-live Gap Sessions (log-scale)}
+\graph{session-longlive-avg}
+\end{frame}
+
+\begin{frame}{Statistics of Interval Sessions}
+\begin{tabular}[t]{|l|r|r|r|r|r|}
+\hline
+ & Total & Average & Max & Min & Std. Dev \\
+\hline
+Requests & 328976877 & 7.5020 & 186043 & 1 & 173.1824 \\
+Traffic & 36277 GB & 867.46 KB & Overflow & 0 & 15.227 MB \\
+Duration & $4.026 * 10^{10}$ & 918.13 s & 3599 s & -6 s & 1502.9 s \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item 43852053 sessions in total.
+  \item Sessions with negative duration is because log items can accidentally be not in time non-decreasing order. I'm not going to fix it, since these 230 wrong sessions have little influence.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Statistics of Gap Sessions}
+\begin{tabular}[t]{|l|r|r|r|r|r|}
+\hline
+ & Total & Average & Max & Min & Std. Dev \\
+\hline
+Requests & 328976877 & 6.6200 & 8432330 & 1 & 1255.9488 \\
+Traffic & 35291 GB & 744.67 KB & Overflow & 0 & 15.184 MB \\
+Duration & $7.666 * 10^{9}$ & 154.27 s & 4406403 & -27 s & 7060.6 s \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item 49694582 sessions in total.
+  \item For comparison with Interval Sessions.
+  \item The following statistics are based on Interval Session if not noted specially.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cumulatives over Sessions order by Traffic DESC}
+\graph{session-req-traffic}
+\end{frame}
+
+\begin{frame}{Cumulatives over Sessions order by Traffic DESC}
+\graph{session-req-traffic-log}
+\end{frame}
+
+\begin{frame}{Cumulatives over Sessions order by Requests DESC}
+\graph{session-req-req-log}
+\end{frame}
+
+\begin{frame}{Cumulatives over Sessions order by Duration DESC}
+\graph{session-req-duration-log}
+\end{frame}
+
+\begin{frame}{Cumulative Session Duration over Unique IPs}
+\graph{session-int-ip}
+\end{frame}
+
+\begin{frame}{Sessions in a day}
+\graph{session-daymin}
+\end{frame}
+
+\begin{frame}{Sessions across days}
+\graph{session-days}
+\end{frame}
+
+\begin{frame}{Sessions in Distributions order by Traffic}
+\graph{session-dist-traffic}
+\end{frame}
+
+\begin{frame}{Sessions in Distributions order by Requests}
+\graph{session-dist-req}
+\end{frame}
+
+\begin{frame}{Sessions in Distributions order by Session Num}
+\graph{session-dist-num}
+\end{frame}
+
+\begin{frame}{Sessions in Distributions order by Duration}
+\graph{session-dist-duration}
+\end{frame}
+
+\begin{frame}{Sessions and User Agents}
+\graph{session-user-agent}
+\end{frame}
+
+\section{Distributions Insight}
+
+\subsection{CentOS}
+
+\begin{frame}{CentOS Basic Stat}
+\begin{tabular}[t]{|l|r|r|r|}
+\hline
+ & Value & \% of total & Rank \\
+\hline
+Requests& 100986986 & 30.7\% & 1 \\
+Traffic & 5252.5 GB & 14.2\% & 4 \\
+Files 	& 70043 & 0.7\% & 19 \\
+FileSize& 172.8 GB & 1.3\% & 12 \\
+Sessions& 19452260 & 44.4\% & 1 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{CentOS Basic Stat - Average}
+\begin{tabular}[t]{|l|r|r|r|r|}
+\hline
+ & Average & Ratio & Std.Dev & Ratio \\
+\hline
+Request Length	& 55846 & 0.464 & 882920 & 0.289 \\
+File Size	& 2665431 & 1.953 & 54320911 & 2.294 \\
+File Requests	& 1402.46 & 76.994 & 92327 & 11.029 \\
+File Traffic	& 74454404 & 32.12 & 1231957014 & 1.784 \\
+Session Duration& 1051.19 & 1.145 & 1586.69 & 1.056 \\
+Session Requests& 5.796 & 0.773 & 137.5 & 0.794 \\
+Session Traffic & 336791 & 0.379 & 8931320 & 0.559 \\
+\hline
+\end{tabular}
+\begin{itemize}
+  \item Std.Dev stands for Standard Deviation.
+  \item `Ratio' in the third col stands for Ratio of Distribution Average to Global Average; `Ratio' in the fifth col stands for Ratio of DIst Std.Dev to Global.
+  \item Size \& Traffic are in bytes, Duration is in seconds.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among CentOS Versions}
+\graph{dist-subdir-centos}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among CentOS 2-level Subdirs}
+\graph{dist-subsubdir-centos}
+\end{frame}
+
+\subsection{Fedora}
+
+\begin{frame}{Fedora Basic Stat}
+\begin{tabular}[t]{|l|r|r|r|}
+\hline
+ & Value & \% of total & Rank \\
+\hline
+Requests& 36329528 & 11.0\% & 4 \\
+Traffic	& 7509.2 GB & 20.3\% & 2 \\
+Files 	& 924620 & 8.8\% & 2 \\
+FileSize& 1207.8 GB & 9.4\% & 2 \\
+Sessions& 3596727 & 8.2\% & 2 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Fedora Basic Stat - Average}
+\begin{tabular}[t]{|l|r|r|r|r|}
+\hline
+ & Average & Ratio & Std.Dev & Ratio \\
+\hline
+Request Length	& 221945 & 1.843 & 2277229 & 0.744 \\
+File Size	& 1407150 & 1.031 & 21376814 & 0.903 \\
+File Requests	& 28.3134 & 1.554 & 6563 & 0.784 \\
+File Traffic	& 3601714 & 1.554 & 190851795 & 0.276 \\
+Session Duration& 1226 & 1.336 & 1598 & 1.063 \\
+Session Requests& 10.8047 & 1.440 & 251.43 & 1.452 \\
+Session Traffic & 2238126 & 2.520 & 21424912 & 1.342 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Fedora Subdirs}
+\graph{dist-subdir-fedora}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Fedora 2-level Subdirs}
+\graph{dist-subsubdir-fedora}
+\end{frame}
+
+\subsection{Ubuntu}
+
+\begin{frame}{Ubuntu Basic Stat}
+\begin{tabular}[t]{|l|r|r|r|}
+\hline
+ & Value & \% of total & Rank \\
+\hline
+Requests& 19193451 & 5.8\% & 5 \\
+Traffic & 5653.1 GB & 15.3\% & 3 \\
+Files 	& 608361 & 5.8\% & 5 \\
+FileSize& 584.6 GB & 4.6\% & 6 \\
+Sessions& 160800 & 0.4\% & 4 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Ubuntu Basic Stat - Average}
+\begin{tabular}[t]{|l|r|r|r|r|}
+\hline
+ & Average & Ratio & Std.Dev & Ratio \\
+\hline
+Request Length	& 316251 & 2.626 & 2950601 & 0.964 \\
+File Size	& 1100038 & 0.806 & 8926254 & 0.377 \\
+File Requests	& 22.2714 & 1.222 & 860.6907 & 0.103 \\
+File Traffic	& 8152155 & 3.517 & 551019922 & 0.798 \\
+Session Duration& 636.37 & 0.693 & 1053.94 & 0.701 \\
+Session Requests& 110.93 & 14.788 & 294.68 & 1.702 \\
+Session Traffic & 34260641 & 38.570 & 101247464 & 6.341 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Ubuntu Subdirs}
+\graph{dist-subdir-ubuntu}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Ubuntu 2-level Subdirs}
+\graph{dist-subsubdir-ubuntu}
+\end{frame}
+
+\subsection{Eclipse}
+
+\begin{frame}{Eclipse Basic Stat}
+\begin{tabular}[t]{|l|r|r|r|}
+\hline
+ & Value & \% of total & Rank \\
+\hline
+Requests& 51279473 & 15.6\% & 3 \\
+Traffic & 11498.6 GB & 31.2\% & 1 \\
+Files 	& 263355 & 2.5\% & 8 \\
+FileSize& 161.1 GB & 1.3\% & 14 \\
+Sessions& 524586 & 1.2\% & 3 \\
+\hline
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Eclipse Basic Stat - Average}
+\begin{tabular}[t]{|l|r|r|r|r|}
+\hline
+ & Average & Ratio & Std.Dev & Ratio \\
+\hline
+Request Length	& 240769 & 2.000 & 5813562 & 1.901 \\
+File Size	& 700002 & 0.513 & 8457323 & 0.357 \\
+File Requests	& 113.5340 & 6.233 & 17894.2 & 2.137 \\
+File Traffic	& 28156070 & 12.148 & 4197033259 & 6.079 \\
+Session Duration& 673.17 & 0.733 & 1059.08 & 0.704 \\
+Session Requests& 97.1089 & 12.944 & 782.80 & 4.520 \\
+Session Traffic & 22130605 & 24.914 & 62746610 & 3.930 \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Eclipse Subdirs}
+\graph{dist-subdir-eclipse}
+\end{frame}
+
+\begin{frame}{Requests \& Traffic among Eclipse SubSubdirs}
+\graph{dist-subsubdir-eclipse}
+\end{frame}
+
+\section{Technical Details}
+
+\begin{frame}{Data Source}
+\begin{itemize}
+  \item Nginx access log of mirrors.ustc.edu.cn 
+  \begin{itemize}
+    \item From 2012-05-22 to 2012-07-12, 51 days
+    \item 4041MB compressed, 62383MB decompressed
+    \item Thanks Guo JiaHua for providing data
+  \end{itemize}
+  \item File list of mirrors.ustc.edu.cn crawled by spider
+  \begin{itemize}
+    \item FTP for CPAN and CRAN
+    \item HTTP other directories
+    \item Need to detect symlinks to parent dir (e.g. /ubuntu/ubuntu/\ldots)
+  \end{itemize}
+  \item Scripts are written in bash and PHP.
+  \begin{itemize}
+    \item All scripts are available at GitHub: https://github.com/bojieli/mirrors-log
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Saving Data in BRIGHTHOUSE}
+\begin{itemize}
+  \item Scanning through such amount of data is time-consuming. And the data is not too large to fit in a relational database.
+  \item I tried InfoBright and InfiniDB with $6.4*10^6$ rows of artificial data, InfiniDB is faster in queries, while InfoBright takes much less disk space.
+  \begin{itemize}
+    \item InfoBright's compress rate is no less than gzip: 4316MB table size, compared to 4041MB gzip, not to mention that I have added some additional rows for faster statistics.
+    \item I do not have much disk space, so I choose InfoBright (a backend of MySQL).
+    \item Most of the queries I used (mostly GROUP BY, WHERE) take less than 2 minutes.
+  \end{itemize}
+  \item Create two FIFOs foreach log: zcat logfile > php (preprocessing) > mysql-ib LOAD DATA INFILE
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Preprocessing}
+\begin{itemize}
+  \item Make queries faster (I'm afraid of full-table scan)
+  \item ip => integers: ipv4 ipv4\_0 ipv4\_1 ipv4\_2 ipv4\_3 ipv6\_0 ipv6\_1 ipv6\_2 ipv6\_3
+  \item time => integers: time year yearday weekday daymin daytime hour
+  \item status (200, 403, 404\ldots)
+  \item length (filesize)
+  \item url => substrings: url\_0 \ldots url\_9 filename extension
+  \item referer (I do not want to analyze it, for Mirrors is not a site of user-interaction)
+  \item ua => ua\_0 (Mozilla, Ubuntu\ldots), ua (full)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Preprocessing}
+\begin{itemize}
+  \item PHP is \emph{slow} \ldots only 3MB/s.
+  \item At first preg\_match (regular exps) take 85\% time, then I optimized the regexp and it only takes 25\% now.
+  \item Xdebug show that stream\_get\_line (fgets) and fputs take about 50\% of total time.
+  \item InfoBright's data loading speed is 15MB/s (crawl\_http.log). I don't think PHP's preprocessing work is harder than database's\ldots
+  \item Maybe PHP's interpretive nature makes it much slower than C. Anyone give a benchmark for Python etc?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Files Table}
+\begin{itemize}
+  \item Many files on mirrors are never accessed, so we have to make a full list of files on mirrors.
+  \item Preprocessed url, filename, extension and filesize are recorded for each file.
+  \item When processing logs and files, escape characters and VARCHAR max length should be taken care of, and filename should not be limited to a simple regular expression, since there are always exceptions: UTF-8 strings in malicious request, ",v" files in CVS \ldots
+\end{itemize}
+\end{frame}
+
+\begin{frame}{GNUPLOT}
+\begin{itemize}
+  \item GNUPLOT is pretty flexible in plotting, the documentation and online demos are consulted many times.
+  \item However GNUPLOT is not flexible in processing data. It is strong type, where integers and strings need to be explicitly converted. And the integer type is limited to $-2^{31}$ ~ $2^{31}-1$.
+  \item When the query result needs to be postprocessed, I write a simple sed  s/regexp/replace/ for simple replacement, or awk NR\%n==0 for sampling. When it comes to accumulation or some complex stuff, a PHP script goes between.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Discovering Sessions}
+\begin{itemize}
+  \item Sequentially scan the log. If a request can fill into an existing session, update it; otherwise create a new one and flush the timeout session if exists.
+  \item Garbage collection of timeout sessions: if (count(array) > gc\_limit) \{ unset timeout sessions; gc\_limit = count(array) * 1.5; \}
+  \begin{itemize}
+    \item Inspired by JavaScript GC algorithm in IE7: If recycled memory is less than 15\% of total, then limit is doubled; if recycled memory is more than 85\%, then reset to initial value.
+  \end{itemize}
+  \item Maintain a query buffer of 10000 rows to reduce query num.
+  \item The PHP takes 4 hours, 15 times slower than C (see the following section).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some Bugs Due to DIE Time Functions (PHP)}
+\begin{itemize}
+  \item PHP: Find some sessions with negative session length. The only explanation is that logs are not in time increasing order. Dive into the log table, only to find that a timestamp matches records in both April 31 and May 1.
+  \item In fact, mktime() accepts 5 parameters just like mktime(struct time\_t) in C, while its month is 1 to 12, different from 0 to 11. However strptime() is a simple encapsulation of its C respective.
+  \item I dare not to use DATETIME in MySQL, because the arithmetic of such timestamps is tricky, and I would rather implement it in SQL or PHP.
+  \item Thanks Godness, no timezone problem this time.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some Bugs Due to DIE Time Functions (C)}
+\begin{itemize}
+  \item C: malloc() fall into deadlock, so strange, I GDBed an evening and no answer. Change some code and accidentally got Segmentation Error in time().
+  \item In fact, time() need a parameter of type time\_t and it is dynamically linked. I used it without any parameter, and time() treats the garbage on stack as its parameter. If it is NULL, nothing happens; if not, the position is considered a struct time\_t and unpredictable stuff happen.
+\end{itemize}
+\end{frame}
+
+\section{Query Optimization}
+
+\begin{frame}[fragile]{Query Optimization}
+\begin{itemize}
+  \item {\small
+\begin{verbatim}
+select count(*), ipv4, count(*) as c, sum(length) as s,
+concat(ipv4_0,'.',ipv4_1,'.',ipv4_2,'.',ipv4_3) from log
+where ipv4 is not null group by ipv4 order by s limit 40;
+\end{verbatim}
+}
+  \item Query\_time: 798.179622
+  \begin{itemize}
+    \item 2012-07-30 16:32:12 Cnd(0):   VC:0(t0a0) IS NOT NULL       (0)
+    \item 2012-07-30 16:33:02 Aggregating: 318575688 tuples left.
+    \item 2012-07-30 16:45:29 Aggregated (1415554 gr). Omitted packrows: 0 + 0 partially, out of 5020 total.
+    \item 2012-07-30 16:45:29 Heap Sort initialized for 1415554 rows, 8+61 bytes each.
+    \item 2012-07-30 16:45:30 Total data packs actually loaded (approx.): 35139
+  \end{itemize}
+  \item Infobright is column-based, so cross-column queries are slow. Try to generate IP string from `ipv4' field.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Query Optimization (continued)}
+\begin{itemize}
+  \item {\small
+\begin{verbatim}
+SELECT ipv4, COUNT(*)/$COUNT, SUM(length)/$LENGTH AS c,
+CONCAT((ipv4 & 255<<24)>>24, '.', (ipv4 & 255<<16)>>16, '.',
+(ipv4 & 255<<8)>>8, '.', (ipv4 & 255)) FROM log WHERE ipv4
+IS NOT NULL GROUP BY ipv4 ORDER BY c DESC LIMIT 40;
+\end{verbatim}
+}
+  \item Query\_time: 585.069205
+  \item InfoBright packs column data into packages, and pre-computed MAX, MIN, AVG and GROUP data for each package. WHERE clause requires re-computation of these data:
+  \begin{itemize}
+    \item 2012-07-30 14:33:06 Cnd(0):   VC:0(t0a0) IS NOT NULL        (0)
+    \item 2012-07-30 14:33:55 Aggregating: 318575688 tuples left.
+    \item 2012-07-30 14:42:47 Generating output.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Query Optimization (continued)}
+\begin{itemize}
+  \item {\small
+\begin{verbatim}
+SELECT ipv4, COUNT(*)/$COUNT, SUM(length)/$LENGTH AS c,
+CONCAT((ipv4 & 255<<24)>>24, '.', (ipv4 & 255<<16)>>16, '.',
+(ipv4 & 255<<8)>>8, '.', (ipv4 & 255)) FROM log GROUP BY
+ipv4 ORDER BY c DESC LIMIT 40;
+\end{verbatim}
+  }
+  \item Query\_time: 328.580979
+  \item WHERE clause is removed, but the result is wrong (includes a large NULL which stands for IPv6).
+  \begin{itemize}
+    \item 2012-07-30 14:45:41 Unoptimized expression near '/'
+    \item 2012-07-30 14:45:41 Unoptimized expression near '/'
+    \item 2012-07-30 14:45:41 Unoptimized expression near 'concat'
+    \item 2012-07-30 14:45:41 Aggregating: 328976877 tuples left.
+  \end{itemize}
+  \item InfoBright calculates these columns for each tuple, no wonder it is slow. Keep the core subquery small. Moving these calculation outside may help.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Query Optimization (continued)}
+\begin{itemize}
+  \item {\small
+\begin{verbatim}
+SELECT ipv4, c/$COUNT, s/$LENGTH, CONCAT((ipv4 &
+255<<24)>>24, '.', (ipv4 & 255<<16)>>16, '.', (ipv4 &
+255<<8)>>8, '.', (ipv4 & 255)) FROM (SELECT ipv4,
+COUNT(*) AS c, SUM(length) AS s FROM log GROUP BY ipv4
+HAVING (ipv4 IS NOT NULL) ORDER BY s DESC LIMIT 40) AS t;
+\end{verbatim}
+}
+  \item Query\_time: 138.297943
+  \begin{itemize}
+    \item Total data packs actually loaded (approx.): 10040
+  \end{itemize}
+  \item Use HAVING clause to filter NULL. The internal exec order is: FROM TABLE, JOIN, OUTER JOIN, WHERE, SELECT clause, GROUP BY, HAVING, ORDER BY, LIMIT, projection \& output.
+  \item Turn on MySQL's query\_cache: identical queries should not be re-executed if I change some GNUPLOT command and run the script again.
+  \item Is there any way to make the query faster? I don't know.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Query Optimization (continued)}
+\begin{itemize}
+  \item Another example of moving expressions `outside' inner query:
+  \item {\small
+\begin{verbatim}
+SELECT ipv4_0, c/$COUNT, s/$LENGTH FROM (SELECT
+IFNULL(ipv4_0, 'IPv6') AS ipv4_0, COUNT(*) AS c,
+SUM(length) AS s FROM log GROUP BY ipv4_0 ORDER BY s
+DESC LIMIT 40) AS t;
+\end{verbatim}
+}
+  \item Query\_time: 263.048662
+  \item {\small
+\begin{verbatim}
+SELECT IFNULL(ipv4_0, 'IPv6'), c/$COUNT, s/$LENGTH
+FROM (SELECT ipv4_0, COUNT(*) AS c, SUM(length) AS s
+FROM log GROUP BY ipv4_0 ORDER BY s DESC LIMIT 40) AS t;
+\end{verbatim}
+}
+  \item Query\_time: 84.589837
+  \item I cannot believe my eyes at the first sight of these figures.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Query Optimization is Not Everything}
+\begin{itemize}
+  \item {\small
+\begin{verbatim}
+SELECT url_0, COUNT(*)/$COUNT, SUM(files.filesize)/$LENGTH
+AS c FROM files WHERE NOT EXISTS (SELECT * FROM log WHERE
+log.filename = files.filename) GROUP BY url_0 ORDER BY c
+DESC LIMIT 40;
+\end{verbatim}
+}
+  \item The query ran 12 hours and I have to kill it. Infobright treats NOT EXISTS clause as dependent subquery and might have to execute it for each row.
+  \item I don't know how to use cursors and storage procedure in MySQL, and more importantly Infobright does not support dynamic update of tables, so SELECT INTO is impossible. 
+  \item I write a C program (using mysqlclient API) to count occurences of each url in log and write it into another table.
+  \item Performance:
+  \begin{itemize}
+    \item 10M rows in files table, 329M rows in log table
+    \item 17.4 minutes in total
+    \item 440000 rows per second at Probe phase
+    \item 460 MB of memory usage (360MB resident)
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Simulating Hash JOIN}
+\begin{itemize}
+  \item I found my algorithm actually named Hash JOIN after programming finished. It is a fast JOIN algorithm for RDBMS. The task is to find, for each distinct value of the join attribute, the set of tuples in each relation which have that value. (Wikipedia)
+  \item My work is to count the occurence in log table of each url in files table.
+  \begin{itemize}
+    \item Build step: Traverse files table and add the url field of each row to a hash list.
+    \item Probe step: Traverse log table and add the counter of the corresponding hash slot.
+    \item Output step: Traverse files table again and output the corresponding counters. The output is FIFOed to LOAD DATA INFILE.
+  \end{itemize}
+  \item Easy to shard horizontally. Steps are similar to Map, Shuffle and Reduce.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Simulating Hash JOIN (continued)}
+\begin{itemize}
+  \item Since there might be many files (currently only about 10M), storing the hash list entirely in memory is my top concern.
+  \item Use one hash for position, two additional hashes for checking, and do not store the original string. $10^{-22}$ probability of undetected hash collision, but it is low enough for an analytic program.
+  \item Only requires 12 bytes for each slot (2 * sizeof(int) hash check, sizeof(int) counter)
+  \item Hash algorithm: DJBX33A (hash = ((hash<<5) + hash) + *key++), used by PHP, Apache and more. Use three seeds for position and check hash.
+  \item Hash collision: Linearly find the next empty slot. This is simple (I'm afraid of pointers) and memory-saving.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The End}
+\begin{itemize}
+  \item I intended to finish it in 3 days, but because I'm unfamiliar with these tools, it takes me a week (or more if including preparation time).
+  \item Access logs are the origin of discoveries on access patterns. Data is precious, while disk is cheap. Please do not delete them after 52 days.
+  \item I cannot draw conclusion on `trends', for there is not data for an adequately long time.
+  \item If you want other statistics, please email me and I will query it (if I have time :).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{After End}
+\begin{itemize}
+  \item Thanks all maintainers and supporters of mirrors.ustc.edu.cn!
+  \item All scripts and source of this slides are available at GitHub: https://github.com/bojieli/mirrors-log
+\end{itemize}
+\end{frame}
+
+\end{document}

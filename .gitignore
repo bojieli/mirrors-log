@@ -1,0 +1,11 @@
+*~
+data/
+*.log
+crawl/output*
+filestat/stat
+filestat_size/stat
+latex/*
+!latex/mirrors.tex
+!latex/mirrors.pdf
+plot/ps
+plot/tmp

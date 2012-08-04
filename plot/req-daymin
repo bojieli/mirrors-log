@@ -1,0 +1,33 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT CONCAT(FLOOR(daymin/60),':',MOD(daymin,60)), c, s FROM (SELECT daymin, COUNT(*) AS c, SUM(length) AS s FROM log GROUP BY daymin ORDER BY daymin) AS t;
+EOF
+
+gnuplot -p << EOF
+set title 'Requests \& Traffic within a day'
+set xlabel 'Time of the day'
+set ylabel 'Requests'
+set ytics nomirror
+set y2tics
+set y2label 'Traffic (Bytes)'
+set yrange [0:4e5]
+set y2range [0:5e10]
+set xdata time
+set timefmt "%H:%M"
+set format x "%H:%M"
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+set linestyle 1 linetype 1 lw 3 lc rgb "red"
+set linestyle 2 linetype 1 lw 3 lc rgb "blue"
+plot '$TMPDIR/$FILENAME' using 1:2 smooth bezier linestyle 1 title 'Request count (Bezier smoothed)' axes x1y1, '$TMPDIR/$FILENAME' using 1:3 smooth bezier linestyle 2 title 'Traffic (Bezier smoothed)' axes x2y2 
+EOF

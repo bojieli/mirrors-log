@@ -1,0 +1,33 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM filestat"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(filesize) FROM filestat"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT x.url_0, x.cx/t.ct AS cp, x.sx/t.st AS sp FROM
+(SELECT url_0, COUNT(*) AS cx, SUM(filesize) AS sx FROM filestat WHERE requests = 0 GROUP BY url_0) AS x,
+(SELECT url_0, COUNT(*) AS ct, SUM(filesize) AS st FROM filestat GROUP BY url_0) AS t
+WHERE x.url_0 = t.url_0 ORDER BY cp DESC LIMIT 40;
+EOF
+
+gnuplot -p << EOF
+set title 'Num \& Size of Never-Accessed Files in each Distribution'
+set xlabel ''
+set ylabel 'Percentage of Distribution'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -45
+set bmargin 10
+set key top right
+set output "$PSDIR/$FILENAME.ps"
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Number', '$TMPDIR/$FILENAME' using 3:xticlabels(1) title 'Size'
+EOF

@@ -1,0 +1,26 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF | awk 'NR%600==0' > "$TMPDIR/$FILENAME"
+SELECT COUNT(*) AS c FROM log GROUP BY time ORDER BY c;
+EOF
+
+gnuplot -p << EOF
+set title 'Sorted Requests per Second'
+set xlabel 'Seconds Percentage (sorted by Requests count)'
+set ylabel 'Requests'
+set xtics 10
+set autoscale
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+set style fill pattern 2
+plot '$TMPDIR/$FILENAME' using (\$0*600/51/24/60/60*100.0):1 lw 3 title 'Seconds Percentage' with filledcurves y1=0
+EOF

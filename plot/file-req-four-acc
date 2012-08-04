@@ -1,0 +1,27 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+bash ./file-req-size-acc
+bash ./file-req-size-desc-acc
+bash ./file-req-req-acc
+bash ./file-req-traffic-acc
+
+gnuplot -p << EOF
+set title 'Cumulative Requests over Cumulative FileSize'
+set xlabel 'Cumulative FileSize order by different metrics'
+set ylabel 'Cumulative Requests'
+set autoscale
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+plot '$TMPDIR/file-req-size-acc' using 3:4 lw 5 title 'FileSize', \
+'$TMPDIR/file-req-size-desc-acc' using 3:4 lw 5 title 'FileSize DESC', \
+'$TMPDIR/file-req-req-acc' using 3:4 lw 5 title 'Requests Num DESC', \
+'$TMPDIR/file-req-traffic-acc' using 3:4 lw 5 title 'Traffic DESC'
+EOF

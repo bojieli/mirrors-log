@@ -1,0 +1,33 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+MYSQLCMD="$MYSQL --column-names=0 -u root mirrors"
+
+COUNT=`$MYSQLCMD -e 'SELECT COUNT(*) FROM sess_int;'`
+REQUESTS=`$MYSQLCMD -e 'SELECT SUM(requests) FROM sess_int;'`
+DURATION=`$MYSQLCMD -e 'SELECT SUM(duration) FROM sess_int;'`
+TRAFFIC=`$MYSQLCMD -e 'SELECT SUM(traffic) FROM sess_int;'`
+
+$MYSQLCMD << EOF | php sample_log_allacc.php > "$TMPDIR/$FILENAME"
+SELECT COUNT(*), SUM(requests), SUM(duration), SUM(traffic) FROM sess_int GROUP BY traffic ORDER BY traffic DESC;
+EOF
+
+gnuplot -p << EOF
+set title 'Cumulative stat over Sessions order by Traffic DESC'
+set xlabel 'Number of Sessions (log-scale) (order by traffic DESC)'
+set ylabel 'Cumulative stat'
+set autoscale
+set logscale x
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+plot '$TMPDIR/$FILENAME' using 1:(\$2/$REQUESTS) lw 5 title 'Requests count', \
+'$TMPDIR/$FILENAME' using 1:(\$3/$DURATION) lw 5 title 'Duration', \
+'$TMPDIR/$FILENAME' using 1:(\$4/$TRAFFIC) lw 5 title 'Traffic'
+EOF

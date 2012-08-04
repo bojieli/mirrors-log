@@ -1,0 +1,37 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+MYSQLCMD="$MYSQL --column-names=0 -u root mirrors"
+
+COUNT=`$MYSQLCMD -e 'SELECT COUNT(*) FROM sess_int;'`
+REQUESTS=`$MYSQLCMD -e 'SELECT SUM(requests) FROM sess_int;'`
+DURATION=`$MYSQLCMD -e 'SELECT SUM(duration) FROM sess_int;'`
+TRAFFIC=`$MYSQLCMD -e 'SELECT SUM(traffic) FROM sess_int;'`
+
+$MYSQLCMD << EOF > "$TMPDIR/$FILENAME"
+SELECT dist, COUNT(*)/$COUNT, SUM(requests)/$REQUESTS, SUM(duration)/$DURATION, SUM(traffic)/$TRAFFIC AS t FROM sess_int GROUP BY dist ORDER BY t DESC LIMIT 20;
+EOF
+
+gnuplot -p << EOF
+set title 'Sessions in each Distribution (order by Traffic)'
+set xlabel ''
+set ylabel 'Percentage'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -45
+set bmargin 10
+set key top right
+set output "$PSDIR/$FILENAME.ps"
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Number', \
+'$TMPDIR/$FILENAME' using 3:xticlabels(1) title 'Requests', \
+'$TMPDIR/$FILENAME' using 4:xticlabels(1) title 'Duration', \
+'$TMPDIR/$FILENAME' using 5:xticlabels(1) title 'Traffic'
+EOF

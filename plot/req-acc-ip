@@ -1,0 +1,26 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME"
+SELECT 1, COUNT(*) AS c FROM log GROUP BY ipv4 HAVING (ipv4 IS NOT NULL) ORDER BY c DESC;
+EOF
+
+gnuplot -p << EOF
+set title 'Cumulative Requests over unique IPs'
+set xlabel 'Percentage of unique IP (log-scale) (sorted by Request Num DESC)'
+set ylabel 'Cumulative Requests'
+set autoscale
+set logscale x
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+set style fill pattern 2
+plot '$TMPDIR/$FILENAME' using 3:4 lw 3 notitle with filledcurves y1=0
+EOF

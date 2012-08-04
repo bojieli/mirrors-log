@@ -1,0 +1,37 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+MYSQLCMD="$MYSQL --column-names=0 -u root mirrors"
+
+COUNT=`$MYSQLCMD -e 'SELECT COUNT(*) FROM sess_int;'`
+REQUESTS=`$MYSQLCMD -e 'SELECT SUM(requests) FROM sess_int;'`
+DURATION=`$MYSQLCMD -e 'SELECT SUM(duration) FROM sess_int;'`
+TRAFFIC=`$MYSQLCMD -e 'SELECT SUM(traffic) FROM sess_int;'`
+STARTDAY=15339 #2012-01-01
+
+$MYSQLCMD << EOF > "$TMPDIR/$FILENAME"
+SELECT day-$STARTDAY, c*100/$COUNT AS cp, r*100/$REQUESTS AS rp, d*100/$DURATION AS dp, t*100/$TRAFFIC AS tp FROM (SELECT day, COUNT(*) AS c, SUM(requests) AS r, SUM(duration) AS d, SUM(traffic) AS t FROM (SELECT FLOOR(start_time/86400) AS day, requests, duration, traffic FROM sess_int) AS x GROUP BY day ORDER BY day) AS y;
+EOF
+
+gnuplot -p << EOF
+set title 'Session statistics across days'
+set xlabel 'Date'
+set ylabel 'Ratio of total'
+set xdata time
+set timefmt "%j"
+set format x "%m-%d"
+set autoscale
+set size 1.5,1.5
+set grid
+set key box
+set key top right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+plot '$TMPDIR/$FILENAME' using 1:(\$2/100) lw 5 title 'Session count', \
+'$TMPDIR/$FILENAME' using 1:(\$3/100) lw 5 title 'Request count', \
+'$TMPDIR/$FILENAME' using 1:(\$4/100) lw 5 title 'Duration', \
+'$TMPDIR/$FILENAME' using 1:(\$5/100) lw 5 title 'Traffic'
+EOF

@@ -1,0 +1,26 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT ua_0, SUM(length) AS c FROM log GROUP BY ua_0 ORDER BY c DESC LIMIT 30;
+EOF
+
+gnuplot -p << EOF
+set title 'Traffic among User Agents'
+set xlabel 'User Agent (excerpted)'
+set ylabel 'Traffic (largest 30)'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -45
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'User Agent'
+EOF

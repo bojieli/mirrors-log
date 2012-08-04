@@ -1,0 +1,29 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM files"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(filesize) FROM files"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT c, SUM(c)/$COUNT, SUM(s)/$LENGTH FROM (SELECT COUNT(*) AS c, SUM(filesize) AS s FROM files GROUP BY filename, extension) AS t GROUP BY c ORDER BY c;
+EOF
+
+gnuplot -p << EOF
+set title 'FileNum and FileSize of Filename swith Different Number of Shares'
+set xlabel 'Number of Files sharing a same FileName and Extension (logscale)'
+set ylabel 'Percentage (logscale)'
+set autoscale
+set size 1.5,1.5
+set grid
+set logscale x
+set logscale y
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data lines
+set key top right
+set output "$PSDIR/$FILENAME.ps"
+plot '$TMPDIR/$FILENAME' using 1:2 lw 5 title 'Total Num', '$TMPDIR/$FILENAME' using 1:3 lw 5 title 'Total Size'
+EOF

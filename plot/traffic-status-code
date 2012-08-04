@@ -1,0 +1,25 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT status, SUM(length) FROM log GROUP BY status ORDER BY status;
+EOF
+
+gnuplot -p << EOF
+set title 'Traffic among HTTP status codes'
+set xlabel 'HTTP status code'
+set ylabel 'Traffic (bytes)'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data histogram
+set style fill solid 0.4 border
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Traffic'
+EOF

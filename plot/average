@@ -1,0 +1,32 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+MYSQLCMD="$MYSQL --column-names=0 -u root mirrors"
+DIST=$1
+COUNT=`$MYSQLCMD -e "SELECT COUNT(*) FROM log"`
+LENGTH=`$MYSQLCMD -e "SELECT AVG(length) FROM log"`
+LENGTHDEV=`$MYSQLCMD -e "SELECT STDDEV(length) FROM log"`
+SIZE=`$MYSQLCMD -e "SELECT AVG(filesize) FROM filestat"`
+SIZEDEV=`$MYSQLCMD -e "SELECT STDDEV(filesize) FROM filestat"`
+REQUESTS=`$MYSQLCMD -e "SELECT AVG(requests) FROM filestat"`
+REQUESTSDEV=`$MYSQLCMD -e "SELECT STDDEV(requests) FROM filestat"`
+TRAFFIC=`$MYSQLCMD -e "SELECT AVG(traffic) FROM filestat"`
+TRAFFICDEV=`$MYSQLCMD -e "SELECT STDDEV(traffic) FROM filestat"`
+DURATION=`$MYSQLCMD -e "SELECT AVG(duration) FROM sess_int"`
+DURATIONDEV=`$MYSQLCMD -e "SELECT STDDEV(duration) FROM sess_int"`
+SESSREQ=`$MYSQLCMD -e "SELECT AVG(requests) FROM sess_int"`
+SESSREQDEV=`$MYSQLCMD -e "SELECT STDDEV(requests) FROM sess_int"`
+SESSTRAFFIC=`$MYSQLCMD -e "SELECT AVG(traffic) FROM sess_int"`
+SESSTRAFFICDEV=`$MYSQLCMD -e "SELECT STDDEV(traffic) FROM sess_int"`
+
+$MYSQL -u root mirrors << EOF
+SELECT AVG(filesize), AVG(filesize)/$SIZE, STDDEV(filesize), STDDEV(filesize)/$SIZEDEV FROM filestat WHERE url_0 = '$DIST';
+SELECT AVG(requests), AVG(requests)/$REQUESTS, STDDEV(requests), STDDEV(requests)/$REQUESTSDEV FROM filestat WHERE url_0 = '$DIST';
+SELECT AVG(traffic), AVG(traffic)/$TRAFFIC, STDDEV(traffic), STDDEV(traffic)/$TRAFFICDEV FROM filestat WHERE url_0 = '$DIST';
+SELECT AVG(duration), AVG(duration)/$DURATION, STDDEV(duration), STDDEV(duration)/$DURATIONDEV FROM sess_int WHERE dist = '$DIST';
+SELECT AVG(requests), AVG(requests)/$SESSREQ, STDDEV(requests), STDDEV(requests)/$SESSREQDEV FROM sess_int WHERE dist = '$DIST';
+SELECT AVG(traffic), AVG(traffic)/$SESSTRAFFIC, STDDEV(traffic), STDDEV(traffic)/$SESSTRAFFICDEV FROM sess_int WHERE dist = '$DIST';
+SELECT AVG(length), AVG(length)/$LENGTH, STDDEV(length), STDDEV(length)/$LENGTHDEV FROM log WHERE url_0 = '$DIST';
+EOF

@@ -1,0 +1,35 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM log"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(length) FROM log"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT ipv4, c/$COUNT, s/$LENGTH, CONCAT((ipv4 & 255<<24)>>24, '.', (ipv4 & 255<<16)>>16, '.', (ipv4 & 255<<8)>>8, '.', (ipv4 & 255)) FROM (SELECT ipv4, COUNT(*) AS c, SUM(length) AS s FROM log GROUP BY ipv4 HAVING (ipv4 IS NOT NULL) ORDER BY s DESC LIMIT 40) AS t;
+EOF
+#SELECT ipv4, COUNT(*)/$COUNT, SUM(length)/$LENGTH AS c FROM log WHERE ipv4 IS NOT NULL GROUP BY ipv4 ORDER BY c DESC LIMIT 40;
+#SELECT ipv4, COUNT(*)/$COUNT, SUM(length)/$LENGTH AS c, CONCAT((ipv4 & 255<<24)>>24, '.', (ipv4 & 255<<16)>>16, '.', (ipv4 & 255<<8)>>8, '.', (ipv4 & 255)) FROM log GROUP BY ipv4 ORDER BY c DESC LIMIT 40;
+
+gnuplot -p << EOF
+set title 'Request \& Traffic among popular IPv4 addrs'
+set xlabel ''
+set ylabel 'Percentage'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -90
+set bmargin 10
+set key top right
+set output "$PSDIR/$FILENAME.ps"
+#integer overflow. it is signed int!
+#ipstr(ip) = (sprintf("%d",floor(ip/(2**24))) .".". sprintf("%d",(ip & 255*(2**16))/(2**16)) .".". sprintf("%d",(ip & 255*(2**8))/(2**8)) .".". sprintf("%d",(ip & 255)))
+#intstr(ip) = ipstr(int(ip));
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(4) title 'Requests', '$TMPDIR/$FILENAME' using 3:xticlabels(4) title 'Traffic'
+EOF

@@ -1,0 +1,30 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM log"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(length) FROM log"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME"
+SELECT IFNULL(ipv4_0, 'IPv6'), c/$COUNT, s/$LENGTH FROM (SELECT ipv4_0, COUNT(*) AS c, SUM(length) AS s FROM log GROUP BY ipv4_0 ORDER BY s DESC LIMIT 40) AS t;
+EOF
+
+gnuplot -p << EOF
+set title 'Request \& Traffic among IPv4 first fields'
+set xlabel ''
+set ylabel 'Percentage'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -45
+set key top right
+set bmargin 3
+set output "$PSDIR/$FILENAME.ps"
+plot '$TMPDIR/$FILENAME' using 2:xticlabels(1) title 'Requests', '$TMPDIR/$FILENAME' using 3:xticlabels(1) title 'Traffic'
+EOF

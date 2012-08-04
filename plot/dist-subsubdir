@@ -1,0 +1,37 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+DIST=$1
+if [ -z $DIST ]; then
+	bash $FILENAME centos
+	bash $FILENAME fedora
+	bash $FILENAME eclipse
+	bash $FILENAME ubuntu
+	exit
+fi
+
+COUNT=`$MYSQL --column-names=0 -u root mirrors -e "SELECT COUNT(*) FROM log WHERE url_0 = '$DIST'"`
+LENGTH=`$MYSQL --column-names=0 -u root mirrors -e "SELECT SUM(length) FROM log WHERE url_0 = '$DIST'"`
+
+$MYSQL --column-names=0 -u root mirrors << EOF > "$TMPDIR/$FILENAME-$DIST"
+SELECT CONCAT(url_1,'/',url_2), c/$COUNT, s/$LENGTH FROM (SELECT url_1, url_2, COUNT(*) AS c, SUM(length) AS s FROM log WHERE url_0 = '$DIST' GROUP BY url_1, url_2 ORDER BY s DESC LIMIT 40) AS t;
+EOF
+
+gnuplot -p << EOF
+set title 'Request \& Traffic of Subdirectories in $DIST'
+set ylabel 'Percentage'
+set autoscale
+set size 1.5,1.5
+set grid noxtics ytics
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set style data histogram
+set style fill solid 0.4 border
+set xtics rotate by -45
+set bmargin 10
+set output "$PSDIR/$FILENAME-$DIST.ps"
+plot '$TMPDIR/$FILENAME-$DIST' using 2:xticlabels(1) title 'Requests', '$TMPDIR/$FILENAME-$DIST' using 3:xticlabels(1) title 'Traffic'
+EOF

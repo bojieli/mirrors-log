@@ -1,0 +1,30 @@
+#!/bin/bash
+FILENAME=`basename $0`
+TMPDIR="tmp"
+PSDIR="ps"
+MYSQL="/home/boj/infobright/mysql-ib"
+
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME-1"
+SELECT 1, AVG(duration) AS c FROM sess GROUP BY ipv4 HAVING (ipv4 IS NOT NULL) ORDER BY c DESC;
+EOF
+
+$MYSQL --column-names=0 -u root mirrors << EOF | php sample_log_xyacc.php > "$TMPDIR/$FILENAME-2"
+SELECT 1, AVG(duration) AS c FROM sess_int GROUP BY ipv4 HAVING (ipv4 IS NOT NULL) ORDER BY c DESC;
+EOF
+
+gnuplot -p << EOF
+set title 'Average Duration over Unique IPs'
+set xlabel 'Percentage of unique IP (sorted by Duration DESC)'
+set ylabel 'Average Duration (log-scale)'
+set autoscale
+set logscale y
+set size 1.5,1.5
+set grid
+set key box
+set key bottom right
+set terminal postscript eps enhanced color
+set output "$PSDIR/$FILENAME.ps"
+set style data lines
+plot '$TMPDIR/$FILENAME-1' using 3:2 lw 5 lc 1 title 'Gap Session', \
+'$TMPDIR/$FILENAME-2' using 3:2 lw 5 lc 3 title 'Interval Session'
+EOF
