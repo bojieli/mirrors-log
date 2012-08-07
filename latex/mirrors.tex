@@ -1,7 +1,9 @@
 \documentclass{beamer}
 \usetheme{Warsaw}
 \setbeamertemplate{headline}{}
-\usepackage{xltxtra}
+\usepackage[slantfont,boldfont]{xeCJK}
+\usepackage{xunicode}
+\setCJKmainfont{文泉驿正黑}
 \usepackage{xcolor}
 \usepackage{verbatim}
 \usepackage{url}
@@ -12,8 +14,8 @@
 \begin{document}
 
 \title{Visualizing Mirrors}
-\subtitle{Access Log Analysis for mirrors.ustc.edu.cn}
-\author{bojieli@gmail.com}
+\subtitle{mirrors.ustc.edu.cn服务器日志分析}
+\author{李博杰 bojieli@gmail.com}
 \institute{\copyright USTC LUG}
 \date{\today}
 \frame{\titlepage}
@@ -889,10 +891,11 @@ DESC LIMIT 40;
 \end{itemize}
 \end{frame}
 
-\begin{frame}{After End}
+\begin{frame}{写在最后}
 \begin{itemize}
   \item Thanks all maintainers and supporters of mirrors.ustc.edu.cn!
   \item All scripts and source of this slides are available at GitHub: https://github.com/bojieli/mirrors-log
+  \item 终于搞定了中文字体问题，不过懒得翻译了……
 \end{itemize}
 \end{frame}
 
