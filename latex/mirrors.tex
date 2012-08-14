@@ -266,23 +266,32 @@ Total & 1957513 (0.60\%) & 379.77 GB (1.03\%) & USTC IPv4 \\
 \graph{file-traffic-traffic-acc}
 \end{frame}
 
-\begin{frame}{Comparison of the Previous four `Caching Policies'}
-\graph{file-traffic-four-acc}
+\begin{frame}{Cache 5: Cumu. Traffic order by Traffic/FileSize}
+\graph{file-traffic-ratio-acc}
+\end{frame}
+
+\begin{frame}{Comparison of the Previous five `Caching Policies'}
+\graph{file-traffic-five-acc}
 \end{frame}
 
 \begin{frame}{Comparison of `Caching Policies' (log-scale)}
-\graph{file-traffic-four-acc-log}
+\graph{file-traffic-five-acc-log}
 \end{frame}
 
 \begin{frame}{Comparison of `Caching Policies'}
 \begin{itemize}
   \item Among these static caching policies, caching files with most traffic or requests is acceptable.
-  \item Caching files that carried most traffic in history has a good performance. A 10GB cache can cover 40\% of the total traffic. If cache size continue to increase, the cache efficiency will deteriorate, since x axis of the graph is in log-scale.
+  \item Caching files that carried most traffic in history has a good performance. A 10GB cache of 85 files can cover 40\% of the total traffic. If cache size continue to increase, the cache efficiency will deteriorate, since x axis of the graph is in log-scale.
+  \item Caching files with largest traffic/filesize ratio shows best performance (by definition). A 10GB cache of 7162 files can cover 58\% of the total traffic.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Details of Most Traffic Caching (log-scale)}
 \graph{file-traffic-traffic-filenum}
+\end{frame}
+
+\begin{frame}{Details of Traffic/FileSize Caching (log-scale)}
+\graph{file-traffic-ratio-filenum}
 \end{frame}
 
 \begin{frame}{An Alternate Metric: Request Hits}

@@ -7,6 +7,7 @@ bash ./file-traffic-size-acc-log
 bash ./file-traffic-size-desc-acc-log
 bash ./file-traffic-req-acc-log
 bash ./file-traffic-traffic-acc-log
+bash ./file-traffic-ratio-acc-log
 
 gnuplot -p << EOF
 set title 'Cumulative Traffic over Cumulative FileSize'
@@ -24,5 +25,6 @@ set style data lines
 plot '$TMPDIR/file-traffic-size-acc-log' using 3:4 lw 5 title 'FileSize', \
 '$TMPDIR/file-traffic-size-desc-acc-log' using 3:4 lw 5 title 'FileSize DESC', \
 '$TMPDIR/file-traffic-req-acc-log' using 3:4 lw 5 title 'Requests Num DESC', \
-'$TMPDIR/file-traffic-traffic-acc-log' using 3:4 lw 5 title 'Traffic DESC'
+'$TMPDIR/file-traffic-traffic-acc-log' using 3:4 lw 5 title 'Traffic DESC', \
+'$TMPDIR/file-traffic-ratio-acc-log' using 3:4 lw 5 title 'Traffic/FileSize DESC'
 EOF
