@@ -4,6 +4,9 @@ data/
 crawl/output*
 filestat/stat
 filestat_size/stat
+cache_sim/simulator
+cache_sim/output
+cache_sim/errlog
 latex/*
 !latex/mirrors.tex
 !latex/mirrors.pdf
